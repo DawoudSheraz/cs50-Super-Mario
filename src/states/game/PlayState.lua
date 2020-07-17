@@ -19,8 +19,12 @@ function PlayState:init()
     self.gravityAmount = 6
 
     self.player = Player({
-        x = 0, y = 0,
-        width = 16, height = 20,
+        -- Move player based on first ground tile
+        -- Width is multiplied so that player is at right
+        -- starting tile. Half-width is added so that player
+        -- is at near center of ground tile
+        x = (self.tileMap:getFirstGround() * PLAYER_WIDTH) + PLAYER_WIDTH/2, y = 0,
+        width = PLAYER_WIDTH, height = PLAYER_HEIGHT,
         texture = 'green-alien',
         stateMachine = StateMachine {
             ['idle'] = function() return PlayerIdleState(self.player) end,
