@@ -56,6 +56,10 @@ PLAYER_JUMP_VELOCITY = -150
 -- snail movement speed
 SNAIL_MOVE_SPEED = 10
 
+-- Player width and height
+PLAYER_WIDTH = 16
+PLAYER_HEIGHT = 20
+
 --
 -- tile IDs
 --
