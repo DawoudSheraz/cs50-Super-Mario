@@ -20,10 +20,10 @@ function PlayState:init()
 
     self.player = Player({
         -- Move player based on first ground tile
-        -- Width is multiplied so that player is at right
-        -- starting tile. Half-width is added so that player
+        -- tile height is multiplied so that player is at right
+        -- starting tile. Half-size is added so that player
         -- is at near center of ground tile
-        x = (self.tileMap:getFirstGround() * PLAYER_WIDTH) + PLAYER_WIDTH/2, y = 0,
+        x = (self.tileMap:getFirstGround() * TILE_SIZE) + TILE_SIZE/2, y = 0,
         width = PLAYER_WIDTH, height = PLAYER_HEIGHT,
         texture = 'green-alien',
         stateMachine = StateMachine {
