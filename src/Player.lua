@@ -13,6 +13,7 @@ Player = Class{__includes = Entity}
 function Player:init(def)
     Entity.init(self, def)
     self.score = 0
+    self.keyPicked = false
 end
 
 function Player:update(dt)
@@ -67,14 +68,17 @@ end
 
 function Player:checkObjectCollisions()
     local collidedObjects = {}
+    local isConsumed;
 
     for k, object in pairs(self.level.objects) do
         if object:collides(self) then
             if object.solid then
                 table.insert(collidedObjects, object)
             elseif object.consumable then
-                object.onConsume(self)
-                table.remove(self.level.objects, k)
+                isConsumed = object.onConsume(self)
+                if isConsumed then
+                    table.remove(self.level.objects, k)
+                end
             end
         end
     end
