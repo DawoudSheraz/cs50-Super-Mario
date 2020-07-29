@@ -63,12 +63,16 @@ function PlayerJumpState:update(dt)
 
                 self.player.y = object.y + object.height
                 self.player.dy = 0
-                self.player:changeState('falling')
-            elseif object.consumable then
-                local isConsumed = object.onConsume(self.player)
-                if isConsumed then
+                
+                -- IF key is picked and current block is locked block
+                if self.player.keyPicked and object.texture == 'keys-and-locks' then
                     table.remove(self.player.level.objects, k)
                 end
+
+                self.player:changeState('falling')
+            elseif object.consumable then
+                object.onConsume(self.player)
+                table.remove(self.player.level.objects, k)
             end
         end
     end
