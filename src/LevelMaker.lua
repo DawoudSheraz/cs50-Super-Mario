@@ -140,7 +140,6 @@ function LevelMaker.generate(width, height)
                                         onConsume = function(player, object)
                                             gSounds['pickup']:play()
                                             player.score = player.score + 100
-                                            return true
                                         end
                                     }
                                     
@@ -164,13 +163,13 @@ function LevelMaker.generate(width, height)
             
             -- Spawn key
             if math.random(10) == 1 and not keySpawned then
-                GenerateKey(keyColor, objects, x, 3)
+                GenerateKey(keyColor, objects, x, blockHeight)
                 keySpawned = true
             end
 
             -- Spawn locked brick
             if math.random(10) == 1 and not lockedBrickSpawned then
-                GenerateBrick(keyColor, objects, x, 3)
+                GenerateBrick(keyColor, objects, x, blockHeight)
                 lockedBrickSpawned = true
             end
         end
@@ -207,7 +206,6 @@ function GenerateKey(color, objects, x, y)
         onConsume = function(player, object)
             gSounds['pickup']:play()
             player.keyPicked = true
-            return true
         end
     })
 
@@ -225,15 +223,11 @@ function GenerateBrick(color, objects, x, y)
         height = 16,
         frame = color + 4,
         collidable = true,
-        consumable = true,
+        consumable = false,
+        solid = true,
 
-        -- Check if player has picked key for locked blocked consume to work
-        onConsume = function(player, object)
-            if player.keyPicked then
-                gSounds['kill2']:play()
-                return true
-            end
-            return false
+        onCollide = function(object)
+            gSounds['kill2']:play()
         end
     })
 end
