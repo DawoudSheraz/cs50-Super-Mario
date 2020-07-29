@@ -22,6 +22,10 @@ function LevelMaker.generate(width, height)
     local tileset = math.random(20)
     local topperset = math.random(20)
 
+    local keySpawned = false
+    local lockedBrickSpawned = false
+    local keyColor = math.random(4)
+
     -- insert blank tables into tiles for later access
     for x = 1, height do
         table.insert(tiles, {})
@@ -136,6 +140,7 @@ function LevelMaker.generate(width, height)
                                         onConsume = function(player, object)
                                             gSounds['pickup']:play()
                                             player.score = player.score + 100
+                                            return true
                                         end
                                     }
                                     
@@ -156,11 +161,79 @@ function LevelMaker.generate(width, height)
                     }
                 )
             end
+            
+            -- Spawn key
+            if math.random(10) == 1 and not keySpawned then
+                GenerateKey(keyColor, objects, x, 3)
+                keySpawned = true
+            end
+
+            -- Spawn locked brick
+            if math.random(10) == 1 and not lockedBrickSpawned then
+                GenerateBrick(keyColor, objects, x, 3)
+                lockedBrickSpawned = true
+            end
         end
+    end
+
+    if not keySpawned then
+        GenerateKey(keyColor, objects, math.random(width), 3)
+    end
+
+    if not lockedBrickSpawned then
+        GenerateBrick(keyColor, objects, math.random(width), 3)
     end
 
     local map = TileMap(width, height)
     map.tiles = tiles
     
     return GameLevel(entities, objects, map)
+end
+
+--[[
+    Helper function to create Key game object
+]]
+function GenerateKey(color, objects, x, y)
+    table.insert(objects, GameObject {
+        texture = 'keys-and-locks',
+        x = (x - 1) * 16,
+        y = (y - 1) * 16,
+        width = 16,
+        height = 16,
+        frame = color,
+        collidable = true,
+        consumable = true,
+
+        onConsume = function(player, object)
+            gSounds['pickup']:play()
+            player.keyPicked = true
+            return true
+        end
+    })
+
+end
+
+--[[
+    Helper function to create locked brick game object
+]]
+function GenerateBrick(color, objects, x, y)
+    table.insert(objects, GameObject {
+        texture = 'keys-and-locks',
+        x = (x - 1) * 16,
+        y = (y - 1) * 16,
+        width = 16,
+        height = 16,
+        frame = color + 4,
+        collidable = true,
+        consumable = true,
+
+        -- Check if player has picked key for locked blocked consume to work
+        onConsume = function(player, object)
+            if player.keyPicked then
+                gSounds['kill2']:play()
+                return true
+            end
+            return false
+        end
+    })
 end
