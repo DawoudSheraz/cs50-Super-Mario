@@ -10,6 +10,8 @@
 
 LevelMaker = Class{}
 
+local keyPicked = false
+
 function LevelMaker.generate(width, height)
     local tiles = {}
     local entities = {}
@@ -159,17 +161,17 @@ function LevelMaker.generate(width, height)
                         end
                     }
                 )
-            end
+            
             
             -- Spawn key
-            if math.random(10) == 1 and not keySpawned then
+            
+        elseif math.random(10) == 1 and not keySpawned then
                 GenerateKey(keyColor, objects, x, blockHeight)
                 keySpawned = true
-            end
 
             -- Spawn locked brick
-            if math.random(10) == 1 and not lockedBrickSpawned then
-                GenerateBrick(keyColor, objects, x, blockHeight)
+            elseif math.random(10) == 1 and not lockedBrickSpawned then
+                GenerateBrick(keyColor, objects, x, blockHeight, width, tiles)
                 lockedBrickSpawned = true
             end
         end
@@ -180,7 +182,7 @@ function LevelMaker.generate(width, height)
     end
 
     if not lockedBrickSpawned then
-        GenerateBrick(keyColor, objects, math.random(width), 3)
+        GenerateBrick(keyColor, objects, math.random(width), 3, width, tiles)
     end
 
     local map = TileMap(width, height)
@@ -206,6 +208,7 @@ function GenerateKey(color, objects, x, y)
         onConsume = function(player, object)
             gSounds['pickup']:play()
             player.keyPicked = true
+            keyPicked = true
         end
     })
 
@@ -214,7 +217,7 @@ end
 --[[
     Helper function to create locked brick game object
 ]]
-function GenerateBrick(color, objects, x, y)
+function GenerateBrick(color, objects, x, y, levelWidth, tiles)
     table.insert(objects, GameObject {
         texture = 'keys-and-locks',
         x = (x - 1) * 16,
@@ -227,7 +230,64 @@ function GenerateBrick(color, objects, x, y)
         solid = true,
 
         onCollide = function(object)
-            gSounds['kill2']:play()
+
+            if keyPicked then
+                local FlagX, FlagY
+
+                for count = levelWidth, 1, -1 do
+                    if tiles[5][count].id == TILE_ID_GROUND then
+                        FlagX = count
+                        FlagY = POLE_HEIGHT/2 - 2
+                        break
+                    
+                    elseif tiles[7][count].id == TILE_ID_GROUND then
+                        FlagX = count
+                        FlagY = 6 + POLE_HEIGHT
+                        break
+                    end
+                    
+                end
+
+                gSounds['kill2']:play()
+                
+                local pole = GameObject {
+                    texture = 'pole',
+                    x = (FlagX * TILE_SIZE) - POLE_WIDTH,
+                    y = FlagY,
+                    width = POLE_WIDTH,
+                    height = POLE_HEIGHT,
+                    frame = math.random(6),
+                    consumable = false,
+                    solid = false,
+
+                }
+
+
+                table.insert(objects, GameObject {
+                    texture = 'flag',
+                    x = pole.x + FLAG_WIDTH/2,
+                    y = pole.y + FLAG_HEIGHT,
+                    width = FLAG_WIDTH,
+                    height = FLAG_HEIGHT,
+                    frame = math.random(4),
+                    consumable = true,
+                    solid = false,
+                    inverted = true,
+
+                    onConsume = function(player, object)
+                        gSounds['pickup']:play()
+                        Timer.after(0.5, function()
+                            gStateMachine:change('play', {
+                            width = levelWidth + 50,
+                            score = player.score
+                        })
+                    end
+                )
+                    end
+                })
+
+                table.insert(objects, pole)
+            end
         end
     })
 end
