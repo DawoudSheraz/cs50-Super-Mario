@@ -12,7 +12,7 @@ Player = Class{__includes = Entity}
 
 function Player:init(def)
     Entity.init(self, def)
-    self.score = 0
+    self.score = def.score
     self.keyPicked = false
 end
 
@@ -68,7 +68,6 @@ end
 
 function Player:checkObjectCollisions()
     local collidedObjects = {}
-    local isConsumed;
 
     for k, object in pairs(self.level.objects) do
         if object:collides(self) then

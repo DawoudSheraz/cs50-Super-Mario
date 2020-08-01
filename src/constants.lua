@@ -60,6 +60,13 @@ SNAIL_MOVE_SPEED = 10
 PLAYER_WIDTH = 16
 PLAYER_HEIGHT = 20
 
+-- Flag and flag pole width and height
+POLE_WIDTH = 16
+POLE_HEIGHT = 46
+FLAG_WIDTH = 16
+FLAG_HEIGHT = 16
+
+
 --
 -- tile IDs
 --
