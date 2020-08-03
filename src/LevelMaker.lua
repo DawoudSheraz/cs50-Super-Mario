@@ -13,6 +13,7 @@ LevelMaker = Class{}
 local keyPicked = false
 
 function LevelMaker.generate(width, height)
+    keyPicked = false
     local tiles = {}
     local entities = {}
     local objects = {}
